@@ -1,5 +1,9 @@
 # pi-mesh
 
+**English** | [简体中文](README.zh-CN.md)
+
+[Detailed flowcharts](docs/ARCHITECTURE.md) · [Verification](VERIFICATION.md)
+
 **Persistent multi-session orchestration for [Pi](https://github.com/earendil-works/pi-mono).**
 
 A portfolio release of [Kenneth0416](https://github.com/Kenneth0416)'s Mesh extension: a TypeScript orchestration kernel that lets a Pi session delegate independent work, exchange durable messages, inspect session state, and stop workers. It extends Pi; it does not implement the underlying model client, coding tools, or terminal UI.
@@ -39,18 +43,20 @@ For parallel edits, prepare **one Git worktree per worker** and pass each worker
 
 ## Architecture
 
-```text
-Pi extension / TUI (index.ts)
-       │ four tools + session events
-       ▼
-Kernel ─── Registry / durable filesystem mailbox
-                        │
-                        ▼
-                 mesh-hostd daemon
-                        │ SessionFactory
-                        ▼
-                 independent Pi SDK sessions
+```mermaid
+flowchart TD
+    U["User / parent Pi session"] --> T["agent · send · sessions · stop"]
+    T --> K["Mesh kernel: validate and route"]
+    K --> M["Registry + durable filesystem mailbox"]
+    M --> H["mesh-hostd: host, wake and recover workers"]
+    H --> F["SessionFactory: create or reopen Pi SDK sessions"]
+    F --> W["Independent worker sessions"]
+    W --> R["Results + observed lifecycle / Git facts"]
+    R --> M
+    M --> P["Parent receives messages at an eligible boundary"]
 ```
+
+[Explore the detailed decision flows →](docs/ARCHITECTURE.md)
 
 - **Kernel and routing** (`src/kernel.ts`, `deliver.ts`): addressing, delegation limits, tool inheritance, and messaging policy.
 - **Durable mail** (`mailbox.ts`, `registry.ts`): atomic file replacement and consume-on-observe delivery. Delivery is **at least once**, not exactly once; recipients must check message IDs before repeating side effects.
@@ -79,8 +85,6 @@ npm test
 
 The existing test suite uses injected fake sessions, temporary directories, and simulated host launchers. It does not need model credentials. See [VERIFICATION.md](VERIFICATION.md) for exact commands, versions, results, and limitations; [TESTING.md](TESTING.md) for the manual acceptance checklist; and [中文设计说明](docs/DESIGN.zh-CN.md) for detailed design notes. The separately referenced `mesh-engineering` skill is optional policy guidance and is not bundled here.
 
-## 中文简介
+## Detailed logic walkthrough
 
-Mesh 是 Kenneth0416 为 Pi 编写的持久化多会话扩展：四个工具 `agent / send / sessions / stop`，配合文件信箱、独立守护进程、会话恢复与 Git 事实通知。它把协作机制与工程策略分开，而不是强制固定角色或流程。
-
-本仓库展示扩展贡献，不把 Pi 上游能力归为原创；未宣称性能提升或真实模型验收完成。安装前请审阅源码与授权状态。工人使用你的模型额度和系统权限；工具白名单、时限和会话树都不是安全沙箱。并行修改必须使用独立 worktree。
+See the [architecture and flowcharts](docs/ARCHITECTURE.md) for source-linked diagrams of delegation, durable message delivery, worker lifecycle, and recovery. A complete [Simplified Chinese introduction](README.zh-CN.md) is also available.
