@@ -1,0 +1,27 @@
+{
+  "name": "pi-mesh",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Persistent multi-session orchestration extension for Pi: agent, send, sessions, stop.",
+  "license": "UNLICENSED",
+  "author": { "name": "Kenneth0416", "url": "https://github.com/Kenneth0416" },
+  "repository": { "type": "git", "url": "https://github.com/Kenneth0416/pi-mesh.git" },
+  "keywords": ["pi-package", "pi-extension", "multi-agent"],
+  "engines": { "node": ">=24" },
+  "pi": { "extensions": ["./index.ts"] },
+  "files": ["index.ts", "src", "prompts", "README.md", "NOTICE.md", "VERIFICATION.md", "TESTING.md", "docs", "test", "tsconfig.check.json"],
+  "scripts": {
+    "check": "tsc -p tsconfig.check.json",
+    "test": "npm run check && node --test --test-force-exit 'test/*.test.ts'"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*",
+    "typebox": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "~5.9.3"
+  }
+}
